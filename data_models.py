@@ -1,8 +1,8 @@
-from typing import Self
+from typing import List, Self
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer, String, DateTime, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
+from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 
 
 class Base(DeclarativeBase):
@@ -19,6 +19,7 @@ class Author(db.Model):
     name: Mapped[str] = mapped_column(String)
     birth_date: Mapped[DateTime] = mapped_column(DateTime)
     date_of_death: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
+    books: Mapped[List['Book']] = relationship(back_populates="author")
 
     def __repr__(self: Self) -> str:
         return f"Author(id = {self.id}, " \
@@ -33,7 +34,8 @@ class Book(db.Model):
     title: Mapped[str] = mapped_column(String)
     publication_year: Mapped[DateTime] = mapped_column(DateTime)
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"))
+    author: Mapped['Author'] = relationship(back_populates='books')
 
     def __repr__(self: Self) -> str:
         return f"Book(id = {self.id}, " \
-               f"title = {self.title})"
+               f"title = {self.title}, {self.publication_year}, {self.author_id})"
