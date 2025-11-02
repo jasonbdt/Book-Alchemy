@@ -6,7 +6,26 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
   </head>
   <body>
+    <form action="/" method="GET">
+        <div>
+            <label for="sort_by">Sort by:</label>
+            <select id="sort_by" name="sort_by">
+                <option value="" hidden="" disabled {{'selected="true"' if not request.args.get('sort_by') else ''}}>-</option>
+                <option value="author_name" {{'selected="true"' if request.args.get('sort_by') == 'author_name' else ''}}>Author Name</option>
+                <option value="book_title" {{'selected="true"' if request.args.get('sort_by') == 'book_title' else ''}}>Book Title</option>
+            </select>
+        </div>
+        <div>
+            <label for="direction">Sort direction:</label>
+            <select id="direction" name="direction">
+                <option value="" hidden="" disabled {{'selected="true"' if not request.args.get('direction') else ''}}>-</option>
+                <option value="asc" {{'selected="true"' if request.args.get('direction') == 'asc' else ''}}>Ascending</option>
+                <option value="desc" {{'selected="true"' if request.args.get('direction') == 'desc' else ''}}>Descending</option>
+            </select>
+        </div>
 
+        <input type="submit" value="Sort" />
+    </form>
     {% for book in books %}
     <div>
         <h3>{{ book.title }}</h3>

@@ -15,8 +15,26 @@ db.init_app(app)
 
 @app.route('/', methods=['GET'])
 def home():
+    sort_by = request.args.get('sort_by', 'book_title')
+    print(request.args)
+    if sort_by == 'book_title':
+        print("BOOK TITLE")
+        sort_key = Book.title
+    elif sort_by == 'author_name':
+        print("AUTHOR NAME")
+        sort_key = Author.name
+
+    sort_direction = request.args.get('direction', 'asc')
+    if sort_direction == 'asc':
+        print("ASC")
+        sort_key = sort_key.asc()
+    elif sort_direction == 'desc':
+        print("DESC")
+        sort_key = sort_key.desc()
+
+
     books = db.session.execute(
-        db.select(Book).select_from(Author).join(Author.books)
+        db.select(Book).select_from(Author).join(Author.books).order_by(sort_key)
     ).scalars()
 
     return render_template("home.html", books=books)
