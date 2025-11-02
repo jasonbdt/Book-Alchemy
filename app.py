@@ -1,6 +1,7 @@
 import os
+from datetime import datetime
 
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 from data_models import db, Author, Book
@@ -11,5 +12,29 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, 'data
 db.init_app(app)
 
 
+@app.route('/add_author', methods=['GET', 'POST'])
+def add_author():
+    if request.method == 'POST':
+        author_name = request.form.get('name')
+        birth_date = request.form.get('birthdate')
+        date_of_death = request.form.get('date_of_death')
+
+        print(birth_date)
+
+        author = Author(
+            name=author_name,
+            birth_date=datetime.strptime(birth_date, '%Y-%m-%d'),
+            date_of_death=datetime.strptime(date_of_death, '%Y-%m-%d') if date_of_death else None
+        )
+        db.session.add(author)
+        db.session.commit()
+        return render_template("add_author.html", author=author)
+
+    return render_template("add_author.html")
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5001, debug=True)
+
+with app.app_context():
+    db.create_all()
