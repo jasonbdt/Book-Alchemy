@@ -13,7 +13,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, 'data
 db.init_app(app)
 
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def home():
     sort_by = request.args.get('sort_by', 'book_title')
     print(request.args)
@@ -32,10 +32,17 @@ def home():
         print("DESC")
         sort_key = sort_key.desc()
 
-
-    books = db.session.execute(
-        db.select(Book).select_from(Author).join(Author.books).order_by(sort_key)
-    ).scalars()
+    search_query = request.form.get('search_query')
+    if search_query:
+        books = db.session.execute(
+            db.select(Book).select_from(Author).join(Author.books)
+            .filter(Book.title.like(f"%{search_query}%")).order_by(sort_key)
+        ).scalars()
+    else:
+        books = db.session.execute(
+            db.select(Book).select_from(Author).join(Author.books)
+            .order_by(sort_key)
+        ).scalars()
 
     return render_template("home.html", books=books)
 

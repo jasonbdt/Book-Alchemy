@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
   </head>
   <body>
-    <form action="/" method="GET">
+    <form action="{{request.url}}" method="GET">
         <div>
             <label for="sort_by">Sort by:</label>
             <select id="sort_by" name="sort_by">
@@ -26,14 +26,29 @@
 
         <input type="submit" value="Sort" />
     </form>
+
+    <form action="{{request.url}}" method="POST">
+        <div>
+            <label for="search_query">Search:</label>
+            <input type="text" id="search_query" name="search_query" value="{{ request.args.get('search_query', '') }}" placeholder="Search Query" />
+        </div>
+
+        <input type="submit" value="Search" />
+    </form>
+
     {% for book in books %}
     <div>
         <h3>{{ book.title }}</h3>
-        <img src="https://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg?default=false" alt="Book Cover of {{book.title}}" />
+        <img src="https://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg?default=false"
+             alt="Book Cover of {{book.title}}" width="180" height="267" />
         <h4>
             Published by {{book.author.name}} at
             {{book.publication_year.strftime('%Y-%m-%d')}}
         </h4>
+    </div>
+    {% else %}
+    <div>
+        There were no books that match the search criteria.
     </div>
     {% endfor %}
 
