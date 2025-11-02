@@ -10,6 +10,7 @@
     {% for book in books %}
     <div>
         <h3>{{ book.title }}</h3>
+        <img src="https://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg?default=false" alt="Book Cover of {{book.title}}" />
         <h4>
             Published by {{book.author.name}} at
             {{book.publication_year.strftime('%Y-%m-%d')}}
