@@ -19,8 +19,6 @@ def add_author():
         birth_date = request.form.get('birthdate')
         date_of_death = request.form.get('date_of_death')
 
-        print(birth_date)
-
         author = Author(
             name=author_name,
             birth_date=datetime.strptime(birth_date, '%Y-%m-%d'),
@@ -33,8 +31,33 @@ def add_author():
     return render_template("add_author.html")
 
 
+@app.route('/add_book', methods=['GET', 'POST'])
+def add_book():
+    authors = db.session.execute(
+        db.select(Author)
+    ).scalars()
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        isbn = request.form.get('isbn')
+        publication_year = request.form.get('publication_year')
+        author_id = request.form.get('author_id')
+
+        book = Book(
+            title=title,
+            isbn=isbn,
+            publication_year=datetime.strptime(publication_year, '%Y-%m-%d'),
+            author_id=author_id
+        )
+        db.session.add(book)
+        db.session.commit()
+        return render_template("add_book.html", authors=authors, book=book)
+
+    return render_template("add_book.html", authors=authors)
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5001, debug=True)
 
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
