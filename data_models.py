@@ -18,7 +18,7 @@ class Author(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String)
     birth_date: Mapped[DateTime] = mapped_column(DateTime)
-    date_of_death: Mapped[DateTime] = mapped_column(DateTime)
+    date_of_death: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
 
     def __repr__(self: Self) -> str:
         return f"Author(id = {self.id}, " \
