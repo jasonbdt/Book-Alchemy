@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import lazyload
 
@@ -10,26 +10,22 @@ from data_models import db, Author, Book
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, 'data/library.sqlite')}"
+app.config['SECRET_KEY'] = "ThisIsAVeryVerySecretKey"
 db.init_app(app)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     sort_by = request.args.get('sort_by', 'book_title')
-    print(request.args)
     if sort_by == 'book_title':
-        print("BOOK TITLE")
         sort_key = Book.title
     elif sort_by == 'author_name':
-        print("AUTHOR NAME")
         sort_key = Author.name
 
     sort_direction = request.args.get('direction', 'asc')
     if sort_direction == 'asc':
-        print("ASC")
         sort_key = sort_key.asc()
     elif sort_direction == 'desc':
-        print("DESC")
         sort_key = sort_key.desc()
 
     search_query = request.form.get('search_query')
@@ -89,6 +85,25 @@ def add_book():
         return render_template("add_book.html", authors=authors, book=book)
 
     return render_template("add_book.html", authors=authors)
+
+
+@app.route('/book/<int:book_id>/delete', methods=['POST'])
+def delete_book(book_id: int):
+    book = db.one_or_404(
+        db.select(Book).filter(Book.id == book_id)
+    )
+    db.session.delete(book)
+    flash(f"Book with ID {book.id} has been deleted successfully.", "system")
+
+    if not book.author.books:
+        author = db.one_or_404(
+            db.select(Author).filter(Author.id == book.author.id)
+        )
+        db.session.delete(author)
+        flash(f"Author with ID {author.id} has been deleted successfully.", "system")
+
+    db.session.commit()
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':
