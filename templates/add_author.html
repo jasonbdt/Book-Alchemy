@@ -7,11 +7,15 @@
   </head>
   <body>
 
-  {% if author %}
-  <div class="success">
-      New author created successfully.
-  </div>
-  {% endif %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+  {% endwith %}
   <form action="/add_author" method="POST">
   <label for="name">Author Name:</label>
   <input type="text" id="name" name="name" required><br><br>

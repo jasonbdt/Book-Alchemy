@@ -54,8 +54,9 @@ def add_author():
             date_of_death=datetime.strptime(date_of_death, '%Y-%m-%d') if date_of_death else None
         )
         db.session.add(author)
+        flash(f"Author \"{author.name}\" has been created successfully.", "system")
         db.session.commit()
-        return render_template("add_author.html", author=author)
+        return redirect(url_for("add_author"))
 
     return render_template("add_author.html")
 
@@ -79,8 +80,10 @@ def add_book():
             author_id=author_id
         )
         db.session.add(book)
+        flash(f"New Book \"{book.title}\" created successfully.", "system")
         db.session.commit()
-        return render_template("add_book.html", authors=authors, book=book)
+
+        return redirect(url_for('add_book'))
 
     return render_template("add_book.html", authors=authors)
 
