@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 from flask import Flask, render_template, request, redirect, url_for, flash
+from sqlalchemy import or_
 
 from data_models import db, Author, Book
 
@@ -30,7 +31,11 @@ def home():
     if search_query:
         books = db.session.execute(
             db.select(Book).select_from(Author).join(Author.books)
-            .filter(Book.title.like(f"%{search_query}%")).order_by(sort_key)
+            .filter(or_(
+                Book.title.like(f"%{search_query}%"),
+                Book.isbn.like(f"%{search_query}%"),
+                Author.name.like(f"%{search_query}%"),
+            )).order_by(sort_key)
         ).scalars()
     else:
         books = db.session.execute(
