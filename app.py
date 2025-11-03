@@ -93,6 +93,24 @@ def add_book():
     return render_template("add_book.html", authors=authors)
 
 
+@app.route('/book/<int:book_id>')
+def book_detail(book_id: int):
+    book = db.one_or_404(
+        db.select(Book).filter(Book.id == book_id)
+    )
+
+    return render_template("book_detail.html", book=book)
+
+
+@app.route('/author/<int:author_id>')
+def author_detail(author_id: int):
+    author = db.one_or_404(
+        db.select(Author).filter(Author.id == author_id)
+    )
+
+    return render_template("author_detail.html", author=author)
+
+
 @app.route('/book/<int:book_id>/delete', methods=['POST'])
 def delete_book(book_id: int):
     book = db.one_or_404(

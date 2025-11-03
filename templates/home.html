@@ -11,16 +11,15 @@
     <!-- Header / Nav -->
     <header class="bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-40">
       <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="/" class="font-semibold tracking-tight text-slate-900">BookAlchemy</a>
+        <a href="{{ url_for('home') }}" class="font-semibold tracking-tight text-slate-900">BookAlchemy</a>
         <nav class="flex items-center gap-2">
-          <a href="/add_author" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-50">Add Author</a>
-          <a href="/add_book" class="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">Add Book</a>
+          <a href="{{ url_for('add_author') }}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-50">Add Author</a>
+          <a href="{{ url_for('add_book') }}" class="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">Add Book</a>
         </nav>
       </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
-      <!-- Flash messages -->
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <div class="mb-6 space-y-2">
@@ -35,7 +34,7 @@
       <div class="mb-6 grid grid-cols-1 gap-3 md:grid-cols-3">
         <!-- Search (POST) -->
         <form action="{{ request.url }}" method="POST" class="col-span-2">
-          <label for="search_query" class="block text-xs font-medium text-slate-600 mb-1">Search</label>
+          <label for="search_query" class="sr-only">Search</label>
           <div class="flex rounded-lg border border-slate-300 bg-white focus-within:ring-2 focus-within:ring-indigo-500">
             <input
               type="text"
@@ -56,8 +55,7 @@
           <div class="col-span-2 grid grid-cols-2 gap-2">
             <div>
               <label for="sort_by" class="block text-xs font-medium text-slate-600 mb-1">Sort by</label>
-              <select id="sort_by" name="sort_by"
-                class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 bg-white">
+              <select id="sort_by" name="sort_by" class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 bg-white">
                 <option value="" hidden disabled {{'selected="true"' if not request.args.get('sort_by') else ''}}>-</option>
                 <option value="author_name" {{'selected="true"' if request.args.get('sort_by') == 'author_name' else ''}}>Author Name</option>
                 <option value="book_title" {{'selected="true"' if request.args.get('sort_by') == 'book_title' else ''}}>Book Title</option>
@@ -65,8 +63,7 @@
             </div>
             <div>
               <label for="direction" class="block text-xs font-medium text-slate-600 mb-1">Direction</label>
-              <select id="direction" name="direction"
-                class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 bg-white">
+              <select id="direction" name="direction" class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 bg-white">
                 <option value="" hidden disabled {{'selected="true"' if not request.args.get('direction') else ''}}>-</option>
                 <option value="asc" {{'selected="true"' if request.args.get('direction') == 'asc' else ''}}>Ascending</option>
                 <option value="desc" {{'selected="true"' if request.args.get('direction') == 'desc' else ''}}>Descending</option>
@@ -86,30 +83,45 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {% for book in books %}
             <article class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-              <div class="aspect-[3/4] bg-slate-100">
+              <a href="{{ url_for('book_detail', book_id=book.id) }}" class="block aspect-[3/4] bg-slate-100">
                 <img
                   src="https://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg?default=false"
                   alt="Book Cover of {{book.title}}"
                   class="h-full w-full object-cover"
                   onerror="this.style.display='none'; this.parentElement.classList.add('flex','items-center','justify-center'); this.parentElement.innerHTML='<div class=&quot;text-slate-400 text-sm&quot;>No cover</div>';"
                 />
-              </div>
+              </a>
               <div class="p-4">
-                <h3 class="text-base font-semibold leading-snug text-slate-900 line-clamp-2">{{ book.title }}</h3>
+                <h3 class="text-base font-semibold leading-snug text-slate-900 line-clamp-2">
+                  <a href="{{url_for('book_detail', book_id=book.id)}}" class="hover:underline">{{ book.title }}</a>
+                </h3>
                 <p class="mt-1 text-sm text-slate-600">
-                  Published by <span class="font-medium text-slate-800">{{ book.author.name }}</span>
-                  on {{ book.publication_year.strftime('%Y-%m-%d') }}
+                  by
+                  {% if book.author %}
+                    <a href="{{ url_for('author_detail', author_id=book.author.id) }}" class="font-medium text-indigo-700 hover:underline">{{ book.author.name }}</a>
+                  {% else %}
+                    <span class="font-medium">Unknown Author</span>
+                  {% endif %}
+                  · {{ book.publication_year.strftime('%Y-%m-%d') if book.publication_year else '—' }}
                 </p>
 
-                <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST" class="mt-4">
-                  <button
-                    type="submit"
-                    class="w-full rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700"
-                    onclick="return confirm('Delete this book?');"
+                <div class="mt-4 grid grid-cols-2 gap-2">
+                  <a
+                    href="{{url_for('book_detail', book_id=book.id)}}"
+                    class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-50"
                   >
-                    Delete Book
-                  </button>
-                </form>
+                    Details
+                  </a>
+                  <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST">
+                    <button
+                      type="submit"
+                      class="w-full rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700"
+                      onclick="return confirm('Delete this book?');"
+                    >
+                      Delete
+                    </button>
+                  </form>
+                </div>
               </div>
             </article>
           {% else %}
