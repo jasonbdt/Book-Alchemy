@@ -1,52 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Add Book</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
+  <body class="min-h-screen bg-gray-50 text-slate-800">
+    <header class="bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-40">
+      <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="/" class="font-semibold tracking-tight text-slate-900">BookAlchemy</a>
+        <nav class="flex items-center gap-2">
+          <a href="/" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-50">Home</a>
+          <a href="/add_author" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-50">Add Author</a>
+        </nav>
+      </div>
+    </header>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for message in messages %}
+    <main class="max-w-3xl mx-auto px-4 py-8">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="mb-6 space-y-2">
+            {% for message in messages %}
+              <div class="rounded-md border border-emerald-200 bg-emerald-50 text-emerald-900 px-4 py-2 text-sm">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% if book %}
+        <div class="mb-6 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-900 text-sm">
+          New book created successfully.
+        </div>
+      {% endif %}
+
+      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="p-6">
+          <h1 class="text-lg font-semibold text-slate-900">Add Book</h1>
+          <p class="mt-1 text-sm text-slate-600">Create a new book entry.</p>
+
+          <form action="/add_book" method="POST" class="mt-6 grid grid-cols-1 gap-5">
             <div>
-                {{ message }}
+              <label for="author_id" class="block text-sm font-medium text-slate-700">Author</label>
+              <select
+                id="author_id"
+                name="author_id"
+                class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {% for author in authors %}
+                  <option value="{{ author.id }}">{{ author.name }}</option>
+                {% endfor %}
+              </select>
             </div>
-        {% endfor %}
-    {% endif %}
-  {% endwith %}
 
-  {% if book %}
-  <div class="success">
-      New book created successfully.
-  </div>
-  {% endif %}
+            <div>
+              <label for="title" class="block text-sm font-medium text-slate-700">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                required
+                class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
 
-  <form action="/add_book" method="POST">
-      <div>
-          <label for="author_id">Author</label>
-          <select id="author_id" name="author_id">
-              {% for author in authors %}
-              <option value="{{ author.id }}">{{ author.name }}</option>
-              {% endfor %}
-          </select>
-      </div>
-      <div>
-          <label for="title">Title</label>
-          <input type="text" id="title" name="title" required />
-      </div>
-      <div>
-          <label for="isbn">ISBN</label>
-          <input type="text" id="isbn" name="isbn" required />
-      </div>
-      <div>
-          <label for="publication_year">Publication Year</label>
-          <input type="date" id="publication_year" name="publication_year" required />
-      </div>
+            <div>
+              <label for="isbn" class="block text-sm font-medium text-slate-700">ISBN</label>
+              <input
+                type="text"
+                id="isbn"
+                name="isbn"
+                required
+                class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
 
-      <input type="submit" value="Add Book" />
-  </form>
+            <div>
+              <label for="publication_year" class="block text-sm font-medium text-slate-700">Publication Year</label>
+              <input
+                type="date"
+                id="publication_year"
+                name="publication_year"
+                required
+                class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
 
+            <div class="flex items-center justify-end gap-2 pt-2">
+              <a href="/" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50">Cancel</a>
+              <button
+                type="submit"
+                class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+              >
+                Add Book
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
   </body>
 </html>

@@ -1,31 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Add Author</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
+  <body class="min-h-screen bg-gray-50 text-slate-800">
+    <header class="bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-40">
+      <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="/" class="font-semibold tracking-tight text-slate-900">BookAlchemy</a>
+        <nav class="flex items-center gap-2">
+          <a href="/" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-50">Home</a>
+          <a href="/add_book" class="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">Add Book</a>
+        </nav>
+      </div>
+    </header>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for message in messages %}
+    <main class="max-w-3xl mx-auto px-4 py-8">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="mb-6 space-y-2">
+            {% for message in messages %}
+              <div class="rounded-md border border-emerald-200 bg-emerald-50 text-emerald-900 px-4 py-2 text-sm">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="p-6">
+          <h1 class="text-lg font-semibold text-slate-900">Add Author</h1>
+          <p class="mt-1 text-sm text-slate-600">Create a new author entry.</p>
+
+          <form action="/add_author" method="POST" class="mt-6 grid grid-cols-1 gap-5">
             <div>
-                {{ message }}
+              <label for="name" class="block text-sm font-medium text-slate-700">Author Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
             </div>
-        {% endfor %}
-    {% endif %}
-  {% endwith %}
-  <form action="/add_author" method="POST">
-  <label for="name">Author Name:</label>
-  <input type="text" id="name" name="name" required><br><br>
 
-  <label for="birthdate">Birthdate:</label>
-  <input type="date" id="birthdate" name="birthdate" required><br><br>
-  <label for="date_of_death">Date of Death:</label>
-  <input type="date" id="date_of_death" name="date_of_death"><br><br>
-  <input type="submit" value="Add Author">
-  </form>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label for="birthdate" class="block text-sm font-medium text-slate-700">Birthdate</label>
+                <input
+                  type="date"
+                  id="birthdate"
+                  name="birthdate"
+                  required
+                  class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div>
+                <label for="date_of_death" class="block text-sm font-medium text-slate-700">Date of Death</label>
+                <input
+                  type="date"
+                  id="date_of_death"
+                  name="date_of_death"
+                  class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
 
+            <div class="flex items-center justify-end gap-2 pt-2">
+              <a href="/" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50">Cancel</a>
+              <button
+                type="submit"
+                class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+              >
+                Add Author
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
   </body>
 </html>

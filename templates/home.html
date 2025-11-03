@@ -1,69 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Books</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <form action="{{request.url}}" method="GET">
-        <div>
-            <label for="sort_by">Sort by:</label>
-            <select id="sort_by" name="sort_by">
-                <option value="" hidden="" disabled {{'selected="true"' if not request.args.get('sort_by') else ''}}>-</option>
+  <body class="min-h-screen bg-gray-50 text-slate-800">
+    <!-- Header / Nav -->
+    <header class="bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-40">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="/" class="font-semibold tracking-tight text-slate-900">BookAlchemy</a>
+        <nav class="flex items-center gap-2">
+          <a href="/add_author" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-50">Add Author</a>
+          <a href="/add_book" class="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">Add Book</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="mb-6 space-y-2">
+            {% for message in messages %}
+              <div class="rounded-md border border-emerald-200 bg-emerald-50 text-emerald-900 px-4 py-2 text-sm">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <!-- Controls -->
+      <div class="mb-6 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <!-- Search (POST) -->
+        <form action="{{ request.url }}" method="POST" class="col-span-2">
+          <label for="search_query" class="block text-xs font-medium text-slate-600 mb-1">Search</label>
+          <div class="flex rounded-lg border border-slate-300 bg-white focus-within:ring-2 focus-within:ring-indigo-500">
+            <input
+              type="text"
+              id="search_query"
+              name="search_query"
+              value="{{ request.values.get('search_query', '') }}"
+              placeholder="Search by title, author, ISBN…"
+              class="w-full rounded-l-lg border-0 px-3 py-2 text-sm outline-none"
+            />
+            <button type="submit" class="rounded-r-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+              Search
+            </button>
+          </div>
+        </form>
+
+        <!-- Sort (GET) -->
+        <form action="{{ request.url }}" method="GET" class="grid grid-cols-3 gap-2">
+          <div class="col-span-2 grid grid-cols-2 gap-2">
+            <div>
+              <label for="sort_by" class="block text-xs font-medium text-slate-600 mb-1">Sort by</label>
+              <select id="sort_by" name="sort_by"
+                class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 bg-white">
+                <option value="" hidden disabled {{'selected="true"' if not request.args.get('sort_by') else ''}}>-</option>
                 <option value="author_name" {{'selected="true"' if request.args.get('sort_by') == 'author_name' else ''}}>Author Name</option>
                 <option value="book_title" {{'selected="true"' if request.args.get('sort_by') == 'book_title' else ''}}>Book Title</option>
-            </select>
-        </div>
-        <div>
-            <label for="direction">Sort direction:</label>
-            <select id="direction" name="direction">
-                <option value="" hidden="" disabled {{'selected="true"' if not request.args.get('direction') else ''}}>-</option>
+              </select>
+            </div>
+            <div>
+              <label for="direction" class="block text-xs font-medium text-slate-600 mb-1">Direction</label>
+              <select id="direction" name="direction"
+                class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 bg-white">
+                <option value="" hidden disabled {{'selected="true"' if not request.args.get('direction') else ''}}>-</option>
                 <option value="asc" {{'selected="true"' if request.args.get('direction') == 'asc' else ''}}>Ascending</option>
                 <option value="desc" {{'selected="true"' if request.args.get('direction') == 'desc' else ''}}>Descending</option>
-            </select>
-        </div>
-
-        <input type="submit" value="Sort" />
-    </form>
-
-    <form action="{{request.url}}" method="POST">
-        <div>
-            <label for="search_query">Search:</label>
-            <input type="text" id="search_query" name="search_query" value="{{ request.args.get('search_query', '') }}" placeholder="Search Query" />
-        </div>
-
-        <input type="submit" value="Search" />
-    </form>
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div>
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    {% for book in books %}
-    <div>
-        <h3>{{ book.title }}</h3>
-        <img src="https://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg?default=false"
-             alt="Book Cover of {{book.title}}" width="180" height="267" />
-        <h4>
-            Published by {{book.author.name}} at
-            {{book.publication_year.strftime('%Y-%m-%d')}}
-        </h4>
-        <form action="{{url_for('delete_book', book_id=book.id)}}" method="POST">
-            <input type="submit" value="Delete Book" />
+              </select>
+            </div>
+          </div>
+          <div class="flex items-end">
+            <button type="submit" class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50">
+              Sort
+            </button>
+          </div>
         </form>
-    </div>
-    {% else %}
-    <div>
-        There were no books that match the search criteria.
-    </div>
-    {% endfor %}
+      </div>
 
+      <!-- Books grid -->
+      <section>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {% for book in books %}
+            <article class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div class="aspect-[3/4] bg-slate-100">
+                <img
+                  src="https://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg?default=false"
+                  alt="Book Cover of {{book.title}}"
+                  class="h-full w-full object-cover"
+                  onerror="this.style.display='none'; this.parentElement.classList.add('flex','items-center','justify-center'); this.parentElement.innerHTML='<div class=&quot;text-slate-400 text-sm&quot;>No cover</div>';"
+                />
+              </div>
+              <div class="p-4">
+                <h3 class="text-base font-semibold leading-snug text-slate-900 line-clamp-2">{{ book.title }}</h3>
+                <p class="mt-1 text-sm text-slate-600">
+                  Published by <span class="font-medium text-slate-800">{{ book.author.name }}</span>
+                  on {{ book.publication_year.strftime('%Y-%m-%d') }}
+                </p>
+
+                <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST" class="mt-4">
+                  <button
+                    type="submit"
+                    class="w-full rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700"
+                    onclick="return confirm('Delete this book?');"
+                  >
+                    Delete Book
+                  </button>
+                </form>
+              </div>
+            </article>
+          {% else %}
+            <div class="col-span-full">
+              <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900">
+                There were no books that match the search criteria.
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
   </body>
 </html>
